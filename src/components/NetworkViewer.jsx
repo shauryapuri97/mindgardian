@@ -14,6 +14,7 @@ import { NETWORK_RESPONSE } from "../constants/MockData";
 export const NetworkViewer = () => {
   const dispatch = useDispatch();
 
+  const selectedNode = useSelector((state) => state.config.selectedNode);
   const selectedNetwork = useSelector((state) => state.config.selectedNetwork);
 
   return (
@@ -32,6 +33,7 @@ export const NetworkViewer = () => {
           gap: DEFAULT_SPACING,
           alignItems: "center",
           padding: INLINE_DEFAULT_SPACING,
+          width: selectedNode ? '80vw' : '100%',
         }}
       >
         <Tooltip title="Go back to home">
@@ -41,15 +43,7 @@ export const NetworkViewer = () => {
         </Tooltip>
         <Typography variant="subtitle1">{selectedNetwork.label}</Typography>
       </Paper>
-      <Paper
-        sx={{
-          display: "flex",
-          flex: 1,
-          padding: INLINE_DEFAULT_SPACING,
-        }}
-      >
-        <NetworkGraph data={NETWORK_RESPONSE} />
-      </Paper>
+      <NetworkGraph data={NETWORK_RESPONSE} />
     </Box>
   );
 };

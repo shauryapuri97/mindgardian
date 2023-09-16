@@ -7,6 +7,10 @@ import { CustomReluNode } from "../CustomNodes/CustomReluNode";
 import { CustomConcatNode } from "../CustomNodes/CustomConcatNode";
 import { CustomMaxPoolNode } from "../CustomNodes/CustomMaxPoolNode";
 import { MarkerType } from "reactflow";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedNode } from "../../slices/configSlice";
+
+import { NetworkGraphDrawer } from "./NetworkGraphDrawer";
 
 const NODE_TYPES = {
   convolution: CustomConvolutionNode,
@@ -16,6 +20,9 @@ const NODE_TYPES = {
 };
 
 export const NetworkGraph = ({ data }) => {
+  const dispatch = useDispatch();
+  const selectedNode = useSelector((state) => state.config.selectedNode);
+
   const { nodes: nodesData, edges: edgesData } = data;
   const initialNodes = useMemo(
     () =>
@@ -76,14 +83,27 @@ export const NetworkGraph = ({ data }) => {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
 
+  const onNodeClick = (_, node) =>
+    node ? dispatch(setSelectedNode(node)) : undefined;
+
   return (
-    <div style={{ width: "100vw", height: "72vh" }}>
-      <ReactFlowProvider>
-        <ReactFlow nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} fitView>
-          <Controls />
-          <Background variant="dots" gap={36} size={1} />
-        </ReactFlow>
-      </ReactFlowProvider>
-    </div>
+    <>
+      <NetworkGraphDrawer />
+      <div style={{ width: !!selectedNode ? "80vw" : "100%", height: "72vh" }}>
+        <ReactFlowProvider>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={NODE_TYPES}
+            fitView
+            onNodeClick={onNodeClick}
+            style={{ background: "#1E1E1E" }}
+          >
+            <Controls />
+            <Background variant="dots" gap={36} size={1} />
+          </ReactFlow>
+        </ReactFlowProvider>
+      </div>
+    </>
   );
 };

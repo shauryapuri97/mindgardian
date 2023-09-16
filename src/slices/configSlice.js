@@ -1,18 +1,20 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-}
+const initialState = {};
 
 export const configSlice = createSlice({
-  name: 'config',
+  name: "config",
   initialState,
   reducers: {
     setSelectedNetwork: (state, action) => {
       state.selectedNetwork = action.payload;
     },
+    setSelectedNode: (state, action) => {
+      state.selectedNode = action.payload;
+    },
   },
-})
+});
 
-export const { setSelectedNetwork } = configSlice.actions
+export const { setSelectedNetwork, setSelectedNode } = configSlice.actions;
 
 export default configSlice.reducer;
