@@ -6,7 +6,7 @@ const AppHeader = () => {
   return (
     <AppBar>
       <Toolbar>
-        <Typography>MINDGARDIAN</Typography>
+        <Typography variant="h6">MINDGARDIAN</Typography>
         <Box sx={{ flexGrow: 1 }} />
         <IconButton>
           <AccountCircle />

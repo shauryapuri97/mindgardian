@@ -3,6 +3,8 @@ import AppHeader from "./components/AppHeader";
 import AppBody from "./components/AppBody";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { Provider } from "react-redux";
+import { store } from "./store";
 
 const darkTheme = createTheme({
   palette: {
@@ -15,11 +17,13 @@ const darkTheme = createTheme({
 
 const App = () => {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <AppHeader />
-      <AppBody />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <AppHeader />
+        <AppBody />
+      </ThemeProvider>
+    </Provider>
   );
 };
 
