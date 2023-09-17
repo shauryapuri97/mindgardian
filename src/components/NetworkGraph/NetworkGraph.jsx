@@ -17,8 +17,16 @@ const NODE_TYPES = {
 
 export const NetworkGraph = ({ data }) => {
   const selectedNode = useSelector((state) => state.config.selectedNode);
-  const { edges, nodes, showNoPathsFound, onNodeClick } =
-    useForwardPassVisualiser(data);
+  const {
+    edges,
+    nodes,
+    showNoPathsFound,
+    onNodeClick,
+    onNodesDelete,
+    onConnect,
+    onNodesChange,
+    onEdgesChange,
+  } = useForwardPassVisualiser(data);
 
   return (
     <>
@@ -31,6 +39,10 @@ export const NetworkGraph = ({ data }) => {
             nodeTypes={NODE_TYPES}
             fitView
             onNodeClick={onNodeClick}
+            onNodesChange={onNodesChange}
+            onNodesDelete={onNodesDelete}
+            onConnect={onConnect}
+            onEdgesChange={onEdgesChange}
             style={{ background: "#1E1E1E" }}
           >
             <Controls />

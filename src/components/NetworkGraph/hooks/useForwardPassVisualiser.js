@@ -4,9 +4,17 @@ import {
   setVisualiseToNode,
 } from "../../../slices/configSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { getFormattedNode } from "../NetworkGraphUtils";
 import { MarkerType } from "reactflow";
+import {
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  getIncomers,
+  getOutgoers,
+  getConnectedEdges,
+} from "reactflow";
 
 export const useForwardPassVisualiser = (data) => {
   const dispatch = useDispatch();
@@ -72,8 +80,8 @@ export const useForwardPassVisualiser = (data) => {
       }, []),
     [edgesData]
   );
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   useEffect(() => {
     console.log("HERE");
@@ -122,5 +130,48 @@ export const useForwardPassVisualiser = (data) => {
     }
   };
 
-  return { nodes, edges, showNoPathsFound, setNodes, setEdges, onNodeClick };
+  const onNodesDelete = useCallback(
+    (deleted) => {
+      setEdges(
+        deleted.reduce((acc, node) => {
+          const incomers = getIncomers(node, nodes, edges);
+          const outgoers = getOutgoers(node, nodes, edges);
+          const connectedEdges = getConnectedEdges([node], edges);
+
+          const remainingEdges = acc.filter(
+            (edge) => !connectedEdges.includes(edge)
+          );
+
+          const createdEdges = incomers.flatMap(({ id: source }) =>
+            outgoers.map(({ id: target }) => ({
+              id: `${source}->${target}`,
+              source,
+              target,
+            }))
+          );
+
+          return [...remainingEdges, ...createdEdges];
+        }, edges)
+      );
+    },
+    [nodes, edges, setEdges]
+  );
+
+  const onConnect = useCallback(
+    (params) => setEdges(addEdge(params, edges)),
+    [edges, setEdges]
+  );
+
+  return {
+    nodes,
+    edges,
+    showNoPathsFound,
+    setNodes,
+    setEdges,
+    onNodeClick,
+    onNodesDelete,
+    onConnect,
+    onNodesChange,
+    onEdgesChange,
+  };
 };
