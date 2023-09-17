@@ -1,19 +1,11 @@
 import ReactFlow, { Controls, Background, ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
-import { CustomConvolutionNode } from "./CustomNodes/CustomConvolutionNode";
-import { CustomReluNode } from "./CustomNodes/CustomReluNode";
-import { CustomConcatNode } from "./CustomNodes/CustomConcatNode";
-import { CustomMaxPoolNode } from "./CustomNodes/CustomMaxPoolNode";
 import { useSelector } from "react-redux";
 import { NetworkGraphDrawer } from "./NetworkGraphDrawer";
 import { useForwardPassVisualiser } from "./hooks/useForwardPassVisualiser";
-
-const NODE_TYPES = {
-  convolution: CustomConvolutionNode,
-  relu: CustomReluNode,
-  concat: CustomConcatNode,
-  maxPool: CustomMaxPoolNode,
-};
+import { useCallback, useState } from "react";
+import { CreateNewNodeModal } from "./CreateNewNodeModal";
+import { NODE_TYPES } from "./NetworkGraphConsts";
 
 export const NetworkGraph = ({ data }) => {
   const selectedNode = useSelector((state) => state.config.selectedNode);
@@ -21,17 +13,36 @@ export const NetworkGraph = ({ data }) => {
     edges,
     nodes,
     showNoPathsFound,
+    reactFlowWrapper,
     onNodeClick,
     onNodesDelete,
     onConnect,
     onNodesChange,
     onEdgesChange,
+    onConnectEnd,
+    onConnectStart,
   } = useForwardPassVisualiser(data);
+  const [isNewNodeCreating, setIsNewNodeCreating] = useState(false);
+  const [connectEndEvent, setConnectEndEvent] = useState(null);
+
+  const onClose = () => setIsNewNodeCreating(false);
+
+  const onCreateNode = (newNodeType) => {
+    onConnectEnd(connectEndEvent, newNodeType);
+  };
+
+  const onUserConnectEnd = useCallback((event) => {
+    setIsNewNodeCreating(true);
+    setConnectEndEvent(event);
+  }, []);
 
   return (
     <>
       <NetworkGraphDrawer showNoPathsFound={showNoPathsFound} />
-      <div style={{ width: !!selectedNode ? "80vw" : "100%", height: "72vh" }}>
+      <div
+        style={{ width: !!selectedNode ? "80vw" : "100%", height: "72vh" }}
+        ref={reactFlowWrapper}
+      >
         <ReactFlowProvider>
           <ReactFlow
             nodes={nodes}
@@ -43,6 +54,8 @@ export const NetworkGraph = ({ data }) => {
             onNodesDelete={onNodesDelete}
             onConnect={onConnect}
             onEdgesChange={onEdgesChange}
+            onConnectStart={onConnectStart}
+            onConnectEnd={onUserConnectEnd}
             style={{ background: "#1E1E1E" }}
           >
             <Controls />
@@ -50,6 +63,11 @@ export const NetworkGraph = ({ data }) => {
           </ReactFlow>
         </ReactFlowProvider>
       </div>
+      <CreateNewNodeModal
+        isOpen={isNewNodeCreating}
+        onClose={onClose}
+        onCreate={onCreateNode}
+      />
     </>
   );
 };

@@ -4,7 +4,7 @@ import {
   setVisualiseToNode,
 } from "../../../slices/configSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { getFormattedNode } from "../NetworkGraphUtils";
 import { MarkerType } from "reactflow";
 import {
@@ -16,6 +16,9 @@ import {
   getConnectedEdges,
 } from "reactflow";
 
+let id = 105;
+const getId = () => `${id++}`;
+
 export const useForwardPassVisualiser = (data) => {
   const dispatch = useDispatch();
   const selectedNode = useSelector((state) => state.config.selectedNode);
@@ -24,6 +27,9 @@ export const useForwardPassVisualiser = (data) => {
   );
   const { nodes: nodesData, edges: edgesData } = data;
   const [showNoPathsFound, setShowNoPathsFound] = useState(false);
+
+  const reactFlowWrapper = useRef(null);
+  const connectingNodeId = useRef(null);
 
   const initialNodes = useMemo(
     () =>
@@ -84,7 +90,6 @@ export const useForwardPassVisualiser = (data) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   useEffect(() => {
-    console.log("HERE");
     if (selectedNode && selectedVisualiseToNode) {
       const { paths } = getPathsDataBetweenNodes(
         edges,
@@ -162,10 +167,48 @@ export const useForwardPassVisualiser = (data) => {
     [edges, setEdges]
   );
 
+  const onConnectStart = useCallback((_, { nodeId }) => {
+    connectingNodeId.current = nodeId;
+  }, []);
+
+  const onConnectEnd = useCallback(
+    (event, newNodeType) => {
+      const targetIsPane = event.target.classList.contains("react-flow__pane");
+
+      if (targetIsPane) {
+        const { top, left } = reactFlowWrapper?.current.getBoundingClientRect();
+        const id = getId();
+        const newNode = {
+          id,
+          position: { x: event.clientX - left - 75, y: event.clientY - top },
+          data: { label: newNodeType },
+          type: newNodeType,
+        };
+
+        setNodes((nds) => nds.concat(newNode));
+        setEdges((eds) =>
+          eds.concat({
+            id,
+            source: connectingNodeId.current,
+            target: id,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 25,
+              height: 25,
+            },
+            label: `Edge ${connectingNodeId.current} -> ${id}`,
+          })
+        );
+      }
+    },
+    [setEdges, setNodes]
+  );
+
   return {
     nodes,
     edges,
     showNoPathsFound,
+    reactFlowWrapper,
     setNodes,
     setEdges,
     onNodeClick,
@@ -173,5 +216,7 @@ export const useForwardPassVisualiser = (data) => {
     onConnect,
     onNodesChange,
     onEdgesChange,
+    onConnectStart,
+    onConnectEnd,
   };
 };
