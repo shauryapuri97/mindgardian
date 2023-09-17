@@ -158,8 +158,9 @@ export const useForwardPassVisualiser = (data) => {
           return [...remainingEdges, ...createdEdges];
         }, edges)
       );
+      dispatch(setSelectedNode());
     },
-    [nodes, edges, setEdges]
+    [dispatch, nodes, edges, setEdges]
   );
 
   const onConnect = useCallback(

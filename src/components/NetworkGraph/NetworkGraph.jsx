@@ -32,8 +32,10 @@ export const NetworkGraph = ({ data }) => {
   };
 
   const onUserConnectEnd = useCallback((event) => {
-    setIsNewNodeCreating(true);
-    setConnectEndEvent(event);
+    if (event.target.classList.contains("react-flow__pane")) {
+      setIsNewNodeCreating(true);
+      setConnectEndEvent(event);
+    }
   }, []);
 
   return (
