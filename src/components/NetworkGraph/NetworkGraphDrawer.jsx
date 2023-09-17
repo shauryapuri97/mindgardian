@@ -5,11 +5,16 @@ import {
   Toolbar,
   IconButton,
   Divider,
+  TextField,
 } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { INLINE_DEFAULT_SPACING } from "../../constants/AppConstants";
+import {
+  DEFAULT_SPACING,
+  INLINE_DEFAULT_SPACING,
+} from "../../constants/AppConstants";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedNode } from "../../slices/configSlice";
+import { setSelectedNode, setVisualiseToNode } from "../../slices/configSlice";
+import { batch } from "react-redux";
 
 const drawerWidth = 240;
 const PARAMETER_KEY_MAP = {
@@ -17,10 +22,13 @@ const PARAMETER_KEY_MAP = {
   stride: "Stride",
 };
 
-export const NetworkGraphDrawer = () => {
+export const NetworkGraphDrawer = ({ showNoPathsFound }) => {
   const dispatch = useDispatch();
-  const { data = undefined } =
+  const { id, data = undefined } =
     useSelector((state) => state.config.selectedNode) ?? {};
+  const selectedVisualiseToNode = useSelector(
+    (state) => state.config.selectedVisualiseToNode
+  );
 
   return (
     <Drawer
@@ -35,32 +43,99 @@ export const NetworkGraphDrawer = () => {
       }}
     >
       <Toolbar />
-      <Box sx={{ padding: INLINE_DEFAULT_SPACING }}>
-        <Box
-          sx={{
-            display: "flex",
-            gap: INLINE_DEFAULT_SPACING,
-            alignItems: "center",
+      <Box
+        sx={{
+          display: "flex",
+          gap: INLINE_DEFAULT_SPACING,
+          alignItems: "center",
+          margin: INLINE_DEFAULT_SPACING,
+        }}
+      >
+        <IconButton
+          onClick={() => {
+            batch(() => {
+              dispatch(setSelectedNode());
+              dispatch(setVisualiseToNode());
+            });
           }}
         >
-          <IconButton onClick={() => dispatch(setSelectedNode())}>
-            <ChevronRightIcon />
-          </IconButton>
-          <Typography variant="subtitle1">
-            {data?.label?.toUpperCase()}
-          </Typography>
-        </Box>
-        <Divider variant="fullWidth" />
-        {data?.parameters &&
+          <ChevronRightIcon />
+        </IconButton>
+        <Typography variant="subtitle1">
+          {data?.label?.toUpperCase()}
+        </Typography>
+      </Box>
+      <Divider />
+      <Box sx={{ padding: INLINE_DEFAULT_SPACING }}>
+        {data?.parameters ? (
           Object.keys(data.parameters).map((param) => (
             <Typography
-              variant="body1"
-              style={{ marginTop: INLINE_DEFAULT_SPACING }}
+              key={`${param}-${data.parameters[param]}`}
+              variant="body2"
+              style={{ margin: INLINE_DEFAULT_SPACING }}
             >
               {PARAMETER_KEY_MAP[param]}: {data.parameters[param]}
             </Typography>
-          ))}
+          ))
+        ) : (
+          <Typography
+            variant="body2"
+            style={{ margin: INLINE_DEFAULT_SPACING }}
+          >
+            No parameters were found
+          </Typography>
+        )}
       </Box>
+      <Divider sx={{ fontSize: "small" }}>Visualise Forward Pass</Divider>
+      <Box
+        sx={{
+          display: "flex",
+          gap: INLINE_DEFAULT_SPACING,
+          padding: DEFAULT_SPACING,
+        }}
+      >
+        <TextField
+          sx={{ flex: 1 }}
+          disabled
+          id="from-select-node"
+          label="From node"
+          value={id}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          size="small"
+        />
+        <TextField
+          sx={{ flex: 1 }}
+          disabled
+          id="to-select-node"
+          label="To node"
+          value={selectedVisualiseToNode?.id ?? ""}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          size="small"
+        />
+      </Box>
+      {!selectedVisualiseToNode?.id && (
+        <Typography
+          variant="caption"
+          align="center"
+          style={{ marginBottom: DEFAULT_SPACING }}
+        >
+          Please select another node from the network to visualise
+        </Typography>
+      )}
+      {showNoPathsFound && (
+        <Typography
+          variant="caption"
+          align="center"
+          style={{ marginBottom: DEFAULT_SPACING, color: 'red' }}
+        >
+          No Paths found, please make sure the nodes are correct
+        </Typography>
+      )}
+      <Divider />
     </Drawer>
   );
 };

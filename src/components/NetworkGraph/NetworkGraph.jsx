@@ -1,16 +1,16 @@
 import ReactFlow, { Controls, Background, ReactFlowProvider } from "reactflow";
 import "reactflow/dist/style.css";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { getFormattedNode } from "./NetworkGraphUtils";
-import { CustomConvolutionNode } from "../CustomNodes/CustomConvolutionNode";
-import { CustomReluNode } from "../CustomNodes/CustomReluNode";
-import { CustomConcatNode } from "../CustomNodes/CustomConcatNode";
-import { CustomMaxPoolNode } from "../CustomNodes/CustomMaxPoolNode";
+import { CustomConvolutionNode } from "./CustomNodes/CustomConvolutionNode";
+import { CustomReluNode } from "./CustomNodes/CustomReluNode";
+import { CustomConcatNode } from "./CustomNodes/CustomConcatNode";
+import { CustomMaxPoolNode } from "./CustomNodes/CustomMaxPoolNode";
 import { MarkerType } from "reactflow";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedNode } from "../../slices/configSlice";
-
+import { setSelectedNode, setVisualiseToNode } from "../../slices/configSlice";
 import { NetworkGraphDrawer } from "./NetworkGraphDrawer";
+import { getPathsDataBetweenNodes } from "./NetworkGraphUtils";
 
 const NODE_TYPES = {
   convolution: CustomConvolutionNode,
@@ -22,6 +22,9 @@ const NODE_TYPES = {
 export const NetworkGraph = ({ data }) => {
   const dispatch = useDispatch();
   const selectedNode = useSelector((state) => state.config.selectedNode);
+  const selectedVisualiseToNode = useSelector(
+    (state) => state.config.selectedVisualiseToNode
+  );
 
   const { nodes: nodesData, edges: edgesData } = data;
   const initialNodes = useMemo(
@@ -77,18 +80,61 @@ export const NetworkGraph = ({ data }) => {
         });
         return acc;
       }, []),
-    [edgesData]
+    [edgesData, selectedNode, selectedVisualiseToNode]
   );
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+  const [showNoPathsFound, setShowNoPathsFound] = useState(false);
 
-  const onNodeClick = (_, node) =>
-    node ? dispatch(setSelectedNode(node)) : undefined;
+  const onNodeClick = (_, node) => {
+    if (node) {
+      if (selectedNode) {
+        dispatch(
+          setVisualiseToNode(!selectedVisualiseToNode ? node : undefined)
+        );
+        if (selectedVisualiseToNode) {
+          dispatch(setSelectedNode(node));
+        }
+      } else {
+        dispatch(setSelectedNode(node));
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (selectedNode && selectedVisualiseToNode) {
+      const { nodes: nodesData, paths } = getPathsDataBetweenNodes(
+        edges,
+        selectedNode.id,
+        selectedVisualiseToNode.id
+      );
+
+      if (paths.size) {
+        setShowNoPathsFound(false);
+        setEdges(
+          edges.map((edge) => ({
+            ...edge,
+            ...(paths.has(edge.id) ? { animated: true } : { animated: false }),
+          }))
+        );
+      } else {
+        setShowNoPathsFound(true);
+      }
+    } else {
+      setEdges(
+        edges.map((edge) => ({
+          ...edge,
+          animated: false,
+        }))
+      );
+      setShowNoPathsFound(false);
+    }
+  }, [selectedNode, selectedVisualiseToNode]);
 
   return (
     <>
-      <NetworkGraphDrawer />
+      <NetworkGraphDrawer showNoPathsFound={showNoPathsFound} />
       <div style={{ width: !!selectedNode ? "80vw" : "100%", height: "72vh" }}>
         <ReactFlowProvider>
           <ReactFlow

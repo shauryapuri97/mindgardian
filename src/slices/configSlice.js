@@ -12,9 +12,13 @@ export const configSlice = createSlice({
     setSelectedNode: (state, action) => {
       state.selectedNode = action.payload;
     },
+    setVisualiseToNode: (state, action) => {
+      state.selectedVisualiseToNode = action.payload;
+    },
   },
 });
 
-export const { setSelectedNetwork, setSelectedNode } = configSlice.actions;
+export const { setSelectedNetwork, setSelectedNode, setVisualiseToNode } =
+  configSlice.actions;
 
 export default configSlice.reducer;
