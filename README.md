@@ -1,70 +1,73 @@
-# Getting Started with Create React App
+# Mindgardian
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a dashboard prototype for Mindgardian, a tool that allows users to be able to visualise and interact with an artificial neural network, dynamically.
 
-## Available Scripts
+https://github.com/shauryapuri97/mindgardian/assets/23358500/ffc4b39a-3921-4cd2-a8ac-b08fbf2e05f8
+
+
+## How to Run
 
 In the project directory, you can run:
+
+### `npm install`
+
+This will install all the necessary packages for the project from package.json
 
 ### `npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features
 
-### `npm test`
+### `Home`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The home page displays a series of networks for the user to choose from with a Quick Search button that allows them to filter through these networks and seamlesly find the one they are looking for.
 
-### `npm run build`
+### `Network Visualiser`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+This is where the magic happens, the user will be able to visualise the directional newural network build on a series of nodes and edges. One can hover on a node to see the type of that node and also find labels on the edges. Clicking on a node opens a panel on the right hand side with more information about the node, including parameters, etc.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### `Visualise forward pass`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+In the visualiser panel, there is an area displaying the source and destination nodes selected. Selecting two nodes simultaneosuly on the graph will find and display all the edges between the two nodes dynamically and seamlessly using animations.
 
-### `npm run eject`
+The uses an algorithm which wasn't as straight forward as I had thought initially. The initial naive approach was to be able to traverse every node from source to target and mark all the visited edges until the target is reached. However, the issue with this approach was that it was marking the edges that would potentially not even lead to the target. The inverse of this however suddenly makes a lot of sense. i.e. start from the target and mark your way back to the source. This gave the algo the accuracy it was missing.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+<img width="1440" alt="Screenshot 2023-09-17 at 15 55 25" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/f6feb5b7-7f8c-4559-8b9c-b998b232e2bc">
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Note: Black is start node, Red is end node.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+#### `Adding a new node`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The next task in hand was for the user to be able to create a node. The last thing I wanted was the user creating an edge and a node seperately. The most minimal and usable experience I coudl come up with was as below:
 
-## Learn More
+1. Click and drag an edge from a node, leave it anywhere on the canvas. This will display a pop up asking the user to pick a type of the new node.
+2. Choose the type and hit create.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Done. Easy.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+Once the node is created you can also choose to continue creating edges between other nodes.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+<img width="1439" alt="Screenshot 2023-09-17 at 15 55 43" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/71102adb-97bc-43e0-a609-a3464f6b1c1d">
 
-### Analyzing the Bundle Size
+#### `Remove a new node / edge`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Click on the node / edge and hit the delete button on your keyboard
 
-### Making a Progressive Web App
+#### `Zoom and Pan`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Use your mouse to zoom in and out of the canvas, you can also use the user controls on the bottom left.
 
-### Advanced Configuration
+<img width="1439" alt="Screenshot 2023-09-17 at 15 56 03" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/8090d643-61ec-4dd8-8969-f6a2d6e21068">
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### `Tech stack`
 
-### Deployment
+ReactJS, Redux Toolkit, React Flow, Material UI
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### `Self reflection`
 
-### `npm run build` fails to minify
+If I were to redo this project / do it aiming for productio, I would definitely make it a Typescript project. With so many reusable components in place, typecasing would really help increase the performance of the application with fewer bugs.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+I would also use Styled compnents or similar for styling across the application instead of doing it inline.
