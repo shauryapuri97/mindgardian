@@ -2,7 +2,11 @@
 
 This is a dashboard prototype for Mindgardian, a tool that allows users to be able to visualise and interact with an artificial neural network, dynamically.
 
-https://github.com/shauryapuri97/mindgardian/assets/23358500/ffc4b39a-3921-4cd2-a8ac-b08fbf2e05f8
+
+https://github.com/shauryapuri97/mindgardian/assets/23358500/5fbd934a-1f20-4127-9e9f-ecec7a211ecb
+
+
+
 
 
 ## How to Run
@@ -34,7 +38,8 @@ In the visualiser panel, there is an area displaying the source and destination 
 
 The uses an algorithm which wasn't as straight forward as I had thought initially. The initial naive approach was to be able to traverse every node from source to target and mark all the visited edges until the target is reached. However, the issue with this approach was that it was marking the edges that would potentially not even lead to the target. The inverse of this however suddenly makes a lot of sense. i.e. start from the target and mark your way back to the source. This gave the algo the accuracy it was missing.
 
-<img width="1440" alt="Screenshot 2023-09-17 at 15 55 25" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/f6feb5b7-7f8c-4559-8b9c-b998b232e2bc">
+<img width="1440" alt="Screenshot 2023-09-17 at 15 55 25" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/ac3cc48c-a87f-4295-ae65-18b610c7557e">
+
 
 Note: Black is start node, Red is end node.
 
@@ -49,8 +54,9 @@ Done. Easy.
 
 
 Once the node is created you can also choose to continue creating edges between other nodes.
+<img width="1439" alt="Screenshot 2023-09-17 at 15 55 43" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/f1726f40-c8f4-4dc1-aa13-35664607f4fd">
 
-<img width="1439" alt="Screenshot 2023-09-17 at 15 55 43" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/71102adb-97bc-43e0-a609-a3464f6b1c1d">
+
 
 #### `Remove a new node / edge`
 
@@ -59,8 +65,9 @@ Click on the node / edge and hit the delete button on your keyboard
 #### `Zoom and Pan`
 
 Use your mouse to zoom in and out of the canvas, you can also use the user controls on the bottom left.
+<img width="1439" alt="Screenshot 2023-09-17 at 15 56 03" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/dd48eed1-dbe7-499b-b8a1-4658148520c6">
 
-<img width="1439" alt="Screenshot 2023-09-17 at 15 56 03" src="https://github.com/shauryapuri97/mindgardian/assets/23358500/8090d643-61ec-4dd8-8969-f6a2d6e21068">
+
 
 ### `Tech stack`
 
